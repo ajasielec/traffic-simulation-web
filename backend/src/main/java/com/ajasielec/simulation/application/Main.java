@@ -1,7 +1,10 @@
 package com.ajasielec.simulation.application;
 
+import com.ajasielec.simulation.utils.RandomJsonGenerator;
+
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 public class Main {
     private static final String DEFAULT_INPUT_FILE = "randomInput.json";
@@ -17,8 +20,12 @@ public class Main {
 
         if (inputFile.equals(DEFAULT_INPUT_FILE)) {
             System.out.println("Too few arguments provided. Starting random simulation.");
-            return;
-            // RandomJsonGenerator.generateRandomJson(inputPath, 10);
+            System.out.println("Enter number of commands to generate:");
+
+            Scanner scanner = new Scanner(System.in);
+            int numberOfCommands = scanner.nextInt();
+            RandomJsonGenerator.generateRandomJson(inputPath, numberOfCommands);
+            scanner.close();
         }
 
         // start the simulation
