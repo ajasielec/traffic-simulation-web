@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Intersection {
     private static final Intersection instance = new Intersection();
+    private static boolean isTestMode = false;
 
     private final Queue<Vehicle> northQueue = new LinkedList<>();
     private final Queue<Vehicle> southQueue = new LinkedList<>();
@@ -24,6 +25,10 @@ public class Intersection {
 
     public static Intersection getInstance() {
         return instance;
+    }
+
+    public void setTestMode(boolean testMode) {
+        isTestMode = testMode;
     }
 
     public void addVehicle (Vehicle vehicle) {
@@ -64,9 +69,11 @@ public class Intersection {
     private void processQueue(Queue<Vehicle> queue, List<String> leftVehicles) throws InterruptedException {
         if (!queue.isEmpty()) {
             Vehicle vehicle = queue.poll();
-            System.out.println(vehicle + " left intersection.");
             leftVehicles.add(vehicle.getId());
-            TimeUnit.SECONDS.sleep(2);
+            if (!isTestMode){
+                System.out.println(vehicle + " left intersection.");
+                TimeUnit.SECONDS.sleep(2);
+            }
         }
     }
 
