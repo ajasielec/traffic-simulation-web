@@ -58,11 +58,13 @@ public class Simulation {
                 Direction end = Direction.valueOf(command.getEndRoad().toUpperCase());
                 Vehicle vehicle = new Vehicle(command.getVehicleId(), start, end);
                 intersection.addVehicle(vehicle);
+                // broadcastMessage("Added vehicle: " + vehicle + " on " + start + " road.");
                 System.out.println("Added vehicle: " + vehicle + " on " + start + " road.");
                 break;
             case "step":
                 List<String> leftVehicles = intersection.step();
                 simulationResult.addStepStatus(new StepStatus(leftVehicles));
+                // broadcastMessage("Step status (left vehicles): " + leftVehicles);
                 System.out.println("Step status (left vehicles): " + leftVehicles);
                 break;
             default:
