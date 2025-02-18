@@ -6,15 +6,18 @@
     <title>Simulation Output</title>
     <link rel="stylesheet" href="style.css"></link>
 </head>
+<noscript>
+    <h2>Sorry! Your browser doesn't support Javascript</h2>
+</noscript>
 
 <body>
     <h1>Simulation Output</h1>
-    <pre id="output">Waiting for simulation data...</pre>
+    <pre id="output">Waiting for connection...</pre>
     <br>
     <button id="startBtn">Start Simulation</button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

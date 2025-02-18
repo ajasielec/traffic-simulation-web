@@ -2,25 +2,29 @@ document.addEventListener("DOMContentLoaded", function () {
     const outputDiv = document.getElementById("output");
     const startBtn = document.getElementById("startBtn");
 
-    // connect to WebSocket server
-    const socket = new WebSocket("ws://localhost:8080/simulation");
+    console.log("Attempting to connect to WebSocket...");
 
-    socket.onopen = function () {
-        console.log("Connected to WebSocket server.");
+    const socket = new SockJS('http://localhost:8080/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.debug = function(str) {
+        console.log(str);
+    };
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
         outputDiv.innerText = "Connected. Waiting for simulation data...\n";
-    };
 
-    socket.onmessage = function (event) {
-        outputDiv.innerText += event.data + "\n";
-        outputDiv.scrollTop = outputDiv.scrollHeight;
-    };
+        stompClient.subscribe('/topic/status', function (message) {
+            console.log('Received:', message.body);
+            outputDiv.innerText += message.body + "\n";
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        });
+    }, function(error) {
+        console.error('STOMP error:', error);
+        outputDiv.innerText = "Connection error: " + error;
+    });
 
-    socket.onclose = function () {
-        console.log("WebSocket connection closed.");
-        outputDiv.innerText += "\nConnection closed.";
-    };
-
-    // function to start simulation
     startBtn.addEventListener("click", function () {
         fetch("http://localhost:8080/start?inputFile=input.json&outputFile=output.json", {
             method: "POST"
@@ -32,5 +36,3 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error starting simulation: ", error));
     });
 });
-
-
