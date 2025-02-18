@@ -13,5 +13,9 @@ mvn exec:java "-Dexec.args=input.json output.json"
 JSON files should be placed in src/main/resources folder
 
 ### Web interface
-You can also start the simulation by visiting:
+You can run the backend using the following command:
+```
+mvn spring-boot:run
+```
+Once the backend is running, start the simulation by visiting:
 http://localhost:8080
