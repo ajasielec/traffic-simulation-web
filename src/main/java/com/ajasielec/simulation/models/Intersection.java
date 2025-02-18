@@ -2,6 +2,7 @@ package com.ajasielec.simulation.models;
 
 import com.ajasielec.simulation.enums.LightColor;
 import com.ajasielec.simulation.enums.TrafficCycle;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-public class Intersection {
+public class Intersection extends AbstractMessageSender {
     private static final Intersection instance = new Intersection();
     private static boolean isTestMode = false;
 
@@ -29,6 +30,13 @@ public class Intersection {
 
     public void setTestMode(boolean testMode) {
         isTestMode = testMode;
+    }
+
+    @Override
+    public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
+        super.messagingTemplate = messagingTemplate;
+        northSouthLight.setMessagingTemplate(messagingTemplate);
+        eastWestLight.setMessagingTemplate(messagingTemplate);
     }
 
     public void addVehicle (Vehicle vehicle) {
@@ -71,7 +79,7 @@ public class Intersection {
             Vehicle vehicle = queue.poll();
             leftVehicles.add(vehicle.getId());
             if (!isTestMode){
-                System.out.println(vehicle + " left intersection.");
+                sendMessage(vehicle + " left intersection.");
                 TimeUnit.SECONDS.sleep(2);
             }
         }

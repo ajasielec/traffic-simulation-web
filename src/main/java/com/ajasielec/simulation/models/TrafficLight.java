@@ -1,12 +1,12 @@
 package com.ajasielec.simulation.models;
 
-import com.ajasielec.simulation.application.Simulation;
 import com.ajasielec.simulation.enums.LightColor;
 import com.ajasielec.simulation.enums.TrafficCycle;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.concurrent.TimeUnit;
 
-public class TrafficLight {
+public class TrafficLight extends AbstractMessageSender {
     private LightColor color;
     private TrafficCycle cycle;
     private static boolean isTestMode = false;
@@ -68,6 +68,6 @@ public class TrafficLight {
     }
 
     public void printLightStatus() {
-        System.out.println("Light on " + cycle + ": " + color);
+        sendMessage("Light on " + cycle + ": " + color);
     }
 }
