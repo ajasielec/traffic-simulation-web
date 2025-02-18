@@ -23,11 +23,12 @@ public class SimulationController {
         messagingTemplate.convertAndSend("/topic/status", "Simulation started with " + inputPath);
 
         Simulation simulation = Simulation.getInstance(inputPath, outputPath);
+        simulation.setMessagingTemplate(messagingTemplate);
         simulation.startSimulation();
 
-        messagingTemplate.convertAndSend("/topic/status", "Simulation completed! Results save to " + outputPath);
+        // messagingTemplate.convertAndSend("/topic/status", "Simulation completed! Results save to " + outputPath);
 
-        return "Simulation started with " + inputFile + " and result saved to " + outputFile;
+        return "Simulation completed! Results save to " + outputPath;
     }
 
 }

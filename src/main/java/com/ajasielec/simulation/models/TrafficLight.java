@@ -1,8 +1,8 @@
 package com.ajasielec.simulation.models;
 
-import com.ajasielec.simulation.application.Simulation;
 import com.ajasielec.simulation.enums.LightColor;
 import com.ajasielec.simulation.enums.TrafficCycle;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +10,7 @@ public class TrafficLight {
     private LightColor color;
     private TrafficCycle cycle;
     private static boolean isTestMode = false;
+    private SimpMessagingTemplate messagingTemplate;
 
     public TrafficLight() {
     }
@@ -21,6 +22,17 @@ public class TrafficLight {
 
     public void setTestMode(boolean isTestMode) {
         this.isTestMode = isTestMode;
+    }
+
+    public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    private void sendMessage(String message) {
+        if (messagingTemplate != null) {
+            messagingTemplate.convertAndSend("/topic/status", message);
+        }
+        System.out.println(message);
     }
 
     public LightColor getColor() {
@@ -68,6 +80,6 @@ public class TrafficLight {
     }
 
     public void printLightStatus() {
-        System.out.println("Light on " + cycle + ": " + color);
+        sendMessage("Light on " + cycle + ": " + color);
     }
 }
