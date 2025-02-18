@@ -8,11 +8,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.io.IOException;
 import java.util.List;
 
-public class Simulation {
+public class Simulation extends AbstractMessageSender {
     private static Simulation instance;
     private final String inputFile;
     private final String outputFile;
-    private SimpMessagingTemplate messagingTemplate;
 
     private Simulation(String inputFile, String outputFile) {
         this.inputFile = inputFile;
@@ -26,17 +25,13 @@ public class Simulation {
         return instance;
     }
 
-    public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
-    }
-
-    private void sendMessage(String message) {
-        if (messagingTemplate != null) {
-            messagingTemplate.convertAndSend("/topic/status", message);
+    public static synchronized Simulation getInstance(String inputFile, String outputFile, SimpMessagingTemplate messagingTemplate) {
+        if (instance == null) {
+            instance = new Simulation(inputFile, outputFile);
         }
-        System.out.println(message);
+        instance.setMessagingTemplate(messagingTemplate);
+        return instance;
     }
-
 
     public void startSimulation() {
         try {

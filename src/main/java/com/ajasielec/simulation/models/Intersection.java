@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-public class Intersection {
+public class Intersection extends AbstractMessageSender {
     private static final Intersection instance = new Intersection();
     private static boolean isTestMode = false;
-    private SimpMessagingTemplate messagingTemplate;
 
     private final Queue<Vehicle> northQueue = new LinkedList<>();
     private final Queue<Vehicle> southQueue = new LinkedList<>();
@@ -32,17 +31,12 @@ public class Intersection {
     public void setTestMode(boolean testMode) {
         isTestMode = testMode;
     }
+
+    @Override
     public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
+        super.messagingTemplate = messagingTemplate;
         northSouthLight.setMessagingTemplate(messagingTemplate);
         eastWestLight.setMessagingTemplate(messagingTemplate);
-    }
-
-    private void sendMessage(String message) {
-        if (messagingTemplate != null) {
-            messagingTemplate.convertAndSend("/topic/status", message);
-        }
-        System.out.println(message);
     }
 
     public void addVehicle (Vehicle vehicle) {
