@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
     const outputDiv = document.getElementById("output");
     const startBtn = document.getElementById("startBtn");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const randomBtn = document.getElementById("randomBtn");
+    const fileInputSection = document.getElementById("fileInputSection");
 
     console.log("Attempting to connect to WebSocket...");
 
@@ -35,4 +38,20 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.error("Error starting simulation: ", error));
     });
+
+    uploadBtn.addEventListener("click", function () {
+
+    })
+
+    randomBtn.addEventListener("click", function () {
+        fetch("http://localhost:8080/startrandom", {
+            method: "POST"
+        })
+            .then(response => response.text())
+            .then(data => {
+                outputDiv.innerText += "\n" + data + "\n";
+            })
+            .catch(error => console.error("Error starting simulation: ", error));
+    });
+
 });

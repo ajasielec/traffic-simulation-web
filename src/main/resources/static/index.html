@@ -11,10 +11,30 @@
 </noscript>
 
 <body>
+    <div class="container">
+        <div class="welcome-text">
+            <h1>Welcome to the Intersection Simulation!</h1>
+            <p>Choose what you want to do:</p>
+        </div>
+
+        <div class="choice-buttons">
+            <button id="uploadBtn" class="button">Upload JSON file with commands</button>
+            <button id="randomBtn" class="button">Start a random simulation</button>
+        </div>
+
+        <div id="fileInputSection" class="file-input-section">
+            <input type="text" id="inputFile" placeholder="Input file name (e.g., input.json)">
+            <input type="text" id="outputFile" placeholder="Output file name (e.g., output.json)">
+        </div>
+
+        <button id="startBtn" class="button">Start Simulation</button>
+
+    </div>
+
     <h1>Simulation Output</h1>
     <pre id="output">Waiting for connection...</pre>
     <br>
-    <button id="startBtn">Start Simulation</button>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>
