@@ -23,8 +23,16 @@
         </div>
 
         <div id="fileInputSection" class="file-input-section">
-            <input type="text" id="inputFile" placeholder="Input file name (e.g., input.json)">
-            <input type="text" id="outputFile" placeholder="Output file name (e.g., output.json)">
+            <label class="input-label" for="inputFile">Input File Name</label>
+            <input type="text" id="inputFile" placeholder="e.g., input.json">
+
+            <label class="input-label" for="outputFile">Output File Name</label>
+            <input type="text" id="outputFile" placeholder="e.g., output.json">
+        </div>
+
+        <div id="randomInputSection" class="random-input-section">
+            <label class="input-label" for="numberOfCommands">Number of Command to generate</label>
+            <input type="number" id="numberOfCommands" placeholder="Enter a number" min="1" value="10"></input>
         </div>
 
         <button id="startBtn" class="button">Start Simulation</button>
@@ -34,7 +42,6 @@
     <h1>Simulation Output</h1>
     <pre id="output">Waiting for connection...</pre>
     <br>
-
 
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>

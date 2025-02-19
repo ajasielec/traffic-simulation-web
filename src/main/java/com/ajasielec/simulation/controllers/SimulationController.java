@@ -1,11 +1,9 @@
 package com.ajasielec.simulation.controllers;
 
 import com.ajasielec.simulation.application.Simulation;
-import com.ajasielec.simulation.models.SimulationResult;
 import com.ajasielec.simulation.utils.RandomJsonGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -42,12 +40,12 @@ public class SimulationController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @PostMapping("/startrandom")
-    public String startRandomSimulation() throws IOException {
+    @PostMapping("/start-random")
+    public String startRandomSimulation(@RequestParam int numberOfCommands) throws IOException {
         String inputPath = Paths.get(RESOURCE_PATH, "randomInput.json").toString();
         String outputPath = Paths.get(RESOURCE_PATH, "randomOutput.json").toString();
 
-        RandomJsonGenerator.generateRandomJson(inputPath, 10);
+        RandomJsonGenerator.generateRandomJson(inputPath, numberOfCommands);
 
         messagingTemplate.convertAndSend("/topic/status", "Simulation started with random JSON");
 
