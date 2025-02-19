@@ -10,8 +10,8 @@ import java.util.List;
 
 public class Simulation extends AbstractMessageSender {
     private static Simulation instance;
-    private final String inputFile;
-    private final String outputFile;
+    private String inputFile;
+    private String outputFile;
 
     private Simulation(String inputFile, String outputFile) {
         this.inputFile = inputFile;
@@ -28,9 +28,16 @@ public class Simulation extends AbstractMessageSender {
     public static synchronized Simulation getInstance(String inputFile, String outputFile, SimpMessagingTemplate messagingTemplate) {
         if (instance == null) {
             instance = new Simulation(inputFile, outputFile);
+        } else {
+            instance.updateFiles(inputFile, outputFile);
         }
         instance.setMessagingTemplate(messagingTemplate);
         return instance;
+    }
+
+    private void updateFiles(String inputFile, String outputFile) {
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
     }
 
     public void startSimulation() {
@@ -46,7 +53,7 @@ public class Simulation extends AbstractMessageSender {
             }
 
             JsonUtils.serializeResult(simulationResult, outputFile);
-            System.out.println("Simulation results saved to: " + outputFile);
+            sendMessage("Simulation results saved to: " + outputFile);
 
         } catch (IOException e) {
             sendMessage("Error reading or writing files: " + e.getMessage());

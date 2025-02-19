@@ -11,10 +11,37 @@
 </noscript>
 
 <body>
+    <div class="container">
+        <div class="welcome-text">
+            <h1>Welcome to the Intersection Simulation!</h1>
+            <p>Choose what you want to do:</p>
+        </div>
+
+        <div class="choice-buttons">
+            <button id="uploadBtn" class="button">Upload JSON file with commands</button>
+            <button id="randomBtn" class="button">Start a random simulation</button>
+        </div>
+
+        <div id="fileInputSection" class="file-input-section">
+            <label class="input-label" for="inputFile">Input File Name</label>
+            <input type="text" id="inputFile" placeholder="e.g., input.json">
+
+            <label class="input-label" for="outputFile">Output File Name</label>
+            <input type="text" id="outputFile" placeholder="e.g., output.json">
+        </div>
+
+        <div id="randomInputSection" class="random-input-section">
+            <label class="input-label" for="numberOfCommands">Number of Command to generate</label>
+            <input type="number" id="numberOfCommands" placeholder="Enter a number" min="1" value="10"></input>
+        </div>
+
+        <button id="startBtn" class="button">Start Simulation</button>
+
+    </div>
+
     <h1>Simulation Output</h1>
     <pre id="output">Waiting for connection...</pre>
     <br>
-    <button id="startBtn">Start Simulation</button>
 
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>
