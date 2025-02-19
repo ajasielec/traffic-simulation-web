@@ -5,12 +5,17 @@ This project simulates traffic at an intersection. The simulation can be run via
 
 ## Running the Simulation
 ### Command Line Execution
-Use the following command to start the simulation with input and output JSON files:
+To start the simulation with specified input and output JSON files, use the following command:
 
 ```
 mvn exec:java "-Dexec.args=input.json output.json"
 ```
-JSON files should be placed in src/main/resources folder
+Ensure that the JSON files are located in the src/main/resources folder.
+
+If no arguments are provided, the program will run a random simulation, generating 10 commands by default:
+```
+mvn exec:java
+```
 
 ### Web interface
 You can run the backend using the following command:
