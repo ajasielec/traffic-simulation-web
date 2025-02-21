@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -30,12 +32,11 @@ public class SimulationControllerTest {
     @InjectMocks
     private SimulationController controller;
 
-    private final String resourcePath = "src/main/resources/";
-
     @Test
     void testStartSimulation_FileExists() throws Exception {
         String inputFile = "testInput.json";
         String outputFile = "testOutput.json";
+        String resourcePath = "src/main/resources/";
         String inputPath = Paths.get(resourcePath, inputFile).toString();
 
         Path tempInputPath = Paths.get(inputPath);
@@ -43,17 +44,15 @@ public class SimulationControllerTest {
         Files.writeString(tempInputPath, "{}");
 
         try {
-            Simulation mockSimulation = mock(Simulation.class);
-
-            try (MockedStatic<Simulation> simulationStatic = mockStatic(Simulation.class)) {
-                simulationStatic.when(() ->
-                                Simulation.getInstance(anyString(), anyString(), any(SimpMessagingTemplate.class)))
-                        .thenReturn(mockSimulation);
-
+            try (MockedConstruction<Simulation> mocked = mockConstruction(Simulation.class)) {
                 ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
 
+                assertEquals(1, mocked.constructed().size());
+
+                Simulation mockSimulation = mocked.constructed().get(0);
+
                 assertEquals(HttpStatus.OK, response.getStatusCode());
-                assertTrue(response.getBody().contains("Simulation completed"));
+                assertTrue(Objects.requireNonNull(response.getBody()).contains("Simulation completed"));
                 verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
                 verify(mockSimulation).startSimulation();
             }
@@ -70,21 +69,24 @@ public class SimulationControllerTest {
         ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody().contains("Input file not found"));
+        assertTrue(Objects.requireNonNull(response.getBody()).contains("Input file not found"));
         verify(messagingTemplate).convertAndSend(anyString(), contains("Input file not found"));
     }
 
     @Test
     void testStartRandomSimulation() throws IOException {
         try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class);
-             MockedStatic<Simulation> simulationStatic = mockStatic(Simulation.class)) {
+             MockedConstruction<Simulation> mocked = mockConstruction(Simulation.class)) {
 
-            Simulation mockSimulation = mock(Simulation.class);
-            simulationStatic.when(() ->
-                            Simulation.getInstance(anyString(), anyString(), any(SimpMessagingTemplate.class)))
-                    .thenReturn(mockSimulation);
+            generatorStatic.when(() ->
+                            RandomJsonGenerator.generateRandomJson(contains("randomInput.json"), eq(5)))
+                    .thenAnswer(invocation -> null);
 
             String result = controller.startRandomSimulation(5);
+
+            assertEquals(1, mocked.constructed().size());
+
+            Simulation mockSimulation = mocked.constructed().get(0);
 
             assertTrue(result.contains("Simulation completed"));
             verify(messagingTemplate).convertAndSend(eq("/topic/status"), eq("Simulation started with random JSON"));
@@ -97,7 +99,7 @@ public class SimulationControllerTest {
     }
 
     @Test
-    void testStartRandomSimulation_GeneratorThrowsException() throws IOException {
+    void testStartRandomSimulation_GeneratorThrowsException() {
         try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class)) {
             generatorStatic.when(() -> RandomJsonGenerator.generateRandomJson(anyString(), anyInt()))
                     .thenThrow(new IOException("Test IO exception"));

@@ -2,6 +2,7 @@ package com.ajasielec.simulation.models;
 
 import com.ajasielec.simulation.enums.LightColor;
 import com.ajasielec.simulation.enums.TrafficCycle;
+import com.ajasielec.simulation.services.AbstractMessageSender;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
@@ -11,8 +12,7 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 public class Intersection extends AbstractMessageSender {
-    private static final Intersection instance = new Intersection();
-    private static boolean isTestMode = false;
+    private boolean isTestMode = false;
 
     private final Queue<Vehicle> northQueue = new LinkedList<>();
     private final Queue<Vehicle> southQueue = new LinkedList<>();
@@ -22,10 +22,12 @@ public class Intersection extends AbstractMessageSender {
     private final TrafficLight northSouthLight = new TrafficLight(LightColor.RED, TrafficCycle.NORTH_SOUTH);
     private final TrafficLight eastWestLight = new TrafficLight(LightColor.GREEN, TrafficCycle.EAST_WEST);
 
-    private Intersection() {}
+    public Intersection() {}
 
-    public static Intersection getInstance() {
-        return instance;
+    public Intersection(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+        northSouthLight.setMessagingTemplate(messagingTemplate);
+        eastWestLight.setMessagingTemplate(messagingTemplate);
     }
 
     public void setTestMode(boolean testMode) {
@@ -40,7 +42,7 @@ public class Intersection extends AbstractMessageSender {
     }
 
     public void addVehicle (Vehicle vehicle) {
-        switch (vehicle.getStartRoad()) {
+        switch (vehicle.startRoad()) {
             case NORTH -> northQueue.add(vehicle);
             case SOUTH -> southQueue.add(vehicle);
             case EAST -> eastQueue.add(vehicle);
@@ -50,16 +52,14 @@ public class Intersection extends AbstractMessageSender {
 
     public List<String> step() throws InterruptedException {
         List<String> leftVehicles = new ArrayList<>();
+        boolean isNorthSouth = shouldSwitchToNorthSouth();
 
-        if (shouldSwitchToNorthSouth()) {
-            switchLights(northSouthLight, eastWestLight);
-            processQueue(northQueue, leftVehicles);
-            processQueue(southQueue, leftVehicles);
-        } else {
-            switchLights(eastWestLight, northSouthLight);
-            processQueue(eastQueue, leftVehicles);
-            processQueue(westQueue, leftVehicles);
-        }
+        switchLights(isNorthSouth ? northSouthLight : eastWestLight,
+                isNorthSouth ? eastWestLight : northSouthLight);
+
+        processQueue(isNorthSouth ? northQueue : eastQueue, leftVehicles);
+        processQueue(isNorthSouth ? southQueue : westQueue, leftVehicles);
+
         return leftVehicles;
     }
 
@@ -75,20 +75,14 @@ public class Intersection extends AbstractMessageSender {
     }
 
     private void processQueue(Queue<Vehicle> queue, List<String> leftVehicles) throws InterruptedException {
-        if (!queue.isEmpty()) {
-            Vehicle vehicle = queue.poll();
-            leftVehicles.add(vehicle.getId());
+        Vehicle vehicle = queue.poll();
+        if (vehicle != null) {
+            leftVehicles.add(vehicle.id());
             if (!isTestMode){
-                sendMessage(vehicle + " left intersection.");
+                sendMessage(String.format("Vehicle %s left the intersection from %s road.",
+                        vehicle.getId(), vehicle.startRoad()));
                 TimeUnit.SECONDS.sleep(2);
             }
         }
-    }
-
-    public void printQueues(){
-        System.out.println("North queue: " + northQueue);
-        System.out.println("South queue: " + southQueue);
-        System.out.println("East queue: " + eastQueue);
-        System.out.println("West queue: " + westQueue);
     }
 }

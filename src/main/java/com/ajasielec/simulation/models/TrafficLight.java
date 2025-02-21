@@ -2,7 +2,7 @@ package com.ajasielec.simulation.models;
 
 import com.ajasielec.simulation.enums.LightColor;
 import com.ajasielec.simulation.enums.TrafficCycle;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.ajasielec.simulation.services.AbstractMessageSender;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +20,7 @@ public class TrafficLight extends AbstractMessageSender {
     }
 
     public void setTestMode(boolean isTestMode) {
-        this.isTestMode = isTestMode;
+        TrafficLight.isTestMode = isTestMode;
     }
 
     public LightColor getColor() {
@@ -36,27 +36,20 @@ public class TrafficLight extends AbstractMessageSender {
     }
 
     private void transitionTo(LightColor nextColor) throws InterruptedException {
+        if (this.color == nextColor) return;
+
         if (this.color != LightColor.YELLOW) {
-            this.color = LightColor.YELLOW;
-            if (!isTestMode) {
-                printLightStatus();
-                TimeUnit.SECONDS.sleep(2);
-            }
+            setLightAndSleep(LightColor.YELLOW, 2);
         }
 
-        this.color = nextColor;
+        setLightAndSleep(nextColor, nextColor == LightColor.GREEN ? 3 : 1);
+    }
+
+    private void setLightAndSleep(LightColor newColor, int sleepTime) throws InterruptedException {
+        this.color = newColor;
         if (!isTestMode) {
-            printLightStatus();
-        }
-
-        if (nextColor == LightColor.GREEN) {
-            if (!isTestMode) {
-                TimeUnit.SECONDS.sleep(3);
-            }
-        } else {
-            if (!isTestMode) {
-                TimeUnit.SECONDS.sleep(1);
-            }
+            sendMessage(String.format("Traffic light on %s changed to %s.", cycle, newColor));
+            TimeUnit.SECONDS.sleep(sleepTime);
         }
     }
 
@@ -65,9 +58,5 @@ public class TrafficLight extends AbstractMessageSender {
         return "TrafficLight{" +
                 "cycle='" + cycle + '\'' +
                 ", currentColor=" + color + '}';
-    }
-
-    public void printLightStatus() {
-        sendMessage("Light on " + cycle + ": " + color);
     }
 }

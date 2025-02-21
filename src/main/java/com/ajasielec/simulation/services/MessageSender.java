@@ -1,4 +1,4 @@
-package com.ajasielec.simulation.models;
+package com.ajasielec.simulation.services;
 
 public interface MessageSender {
     void sendMessage(String message);

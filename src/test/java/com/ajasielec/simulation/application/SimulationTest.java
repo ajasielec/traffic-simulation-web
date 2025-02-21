@@ -13,14 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SimulationTest {
     @Test
     void testSimulationSteps() throws InterruptedException {
-        // skip delays
         TrafficLight light = new TrafficLight();
         light.setTestMode(true);
 
-        Intersection intersection = Intersection.getInstance();
+        Intersection intersection = new Intersection();
         intersection.setTestMode(true);
 
-        // add vehicles and perform simulation steps
         intersection.addVehicle(new Vehicle("vehicle1", Direction.SOUTH, Direction.NORTH));
         intersection.addVehicle(new Vehicle("vehicle2", Direction.NORTH, Direction.EAST));
 

@@ -2,7 +2,6 @@ package com.ajasielec.simulation.controllers;
 
 import com.ajasielec.simulation.application.Simulation;
 import com.ajasielec.simulation.utils.RandomJsonGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,8 +15,11 @@ import java.nio.file.Paths;
 public class SimulationController {
     private static final String RESOURCE_PATH = "src/main/resources/";
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public SimulationController(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @PostMapping("/start")
     public ResponseEntity<String> startSimulation(@RequestParam String inputFile, @RequestParam String outputFile) {
@@ -30,12 +32,15 @@ public class SimulationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
 
-        messagingTemplate.convertAndSend("/topic/status", "Simulation started with " + inputPath);
+        try {
+            Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
+            simulation.startSimulation();
+            messagingTemplate.convertAndSend("/topic/status", "\nSimulation completed!\n");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Simulation failed: " + e.getMessage());
+        }
 
-        Simulation simulation = Simulation.getInstance(inputPath, outputPath, messagingTemplate);
-        simulation.startSimulation();
-
-        String successMessage = "Simulation completed! Results saved to " + outputPath;
+        String successMessage = "Simulation completed!\n";
 
         return ResponseEntity.ok(successMessage);
     }
@@ -47,12 +52,11 @@ public class SimulationController {
 
         RandomJsonGenerator.generateRandomJson(inputPath, numberOfCommands);
 
-        messagingTemplate.convertAndSend("/topic/status", "Simulation started with random JSON");
-
-        Simulation simulation = Simulation.getInstance(inputPath, outputPath, messagingTemplate);
+        Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
         simulation.startSimulation();
 
-        return "Simulation completed! Results save to " + outputPath;
-    }
+        messagingTemplate.convertAndSend("/topic/status", "\nSimulation completed!\n");
 
+        return "Simulation completed!\n";
+    }
 }

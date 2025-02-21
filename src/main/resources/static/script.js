@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const randomInputSection = document.getElementById("randomInputSection");
     const startBtn = document.getElementById("startBtn");
     let isCustomFile = false;
+    let isSimulationRunning = false;
 
     console.log("Attempting to connect to WebSocket...");
 
@@ -23,12 +24,39 @@ document.addEventListener("DOMContentLoaded", function () {
         stompClient.subscribe('/topic/status', function (message) {
             console.log('Received:', message.body);
             outputDiv.innerText += message.body + "\n";
-            outputDiv.scrollTop = outputDiv.scrollHeight;
+
+            if (message.body.includes("completed") ||
+                message.body.includes("Simulation failed") ||
+                message.body.includes("Input file not found")) {
+                enableStartButton();
+            }
+
+            setTimeout(() => {
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }, 10);
         });
     }, function(error) {
         console.error('STOMP error:', error);
         outputDiv.innerText = "Connection error: " + error;
     });
+
+    function scrollToBottom() {
+        outputDiv.scrollTop = outputDiv.scrollHeight;
+    }
+
+    function disableStartButton() {
+        startBtn.disabled = true;
+        startBtn.style.opacity = "0.5";
+        startBtn.style.cursor = "not-allowed";
+        isSimulationRunning = true;
+    }
+
+    function enableStartButton() {
+        startBtn.disabled = false;
+        startBtn.style.opacity = "1";
+        startBtn.style.cursor = "pointer";
+        isSimulationRunning = false;
+    }
 
     uploadBtn.addEventListener("click", function () {
         fileInputSection.style.display = "block";
@@ -49,44 +77,35 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     startBtn.addEventListener("click", function () {
+        if (isSimulationRunning) {
+            return;
+        }
+
+        disableStartButton();
+        scrollToBottom();
+
+        let url;
+
         if (isCustomFile) {
             const inputFile = document.getElementById("inputFile").value;
             const outputFile = document.getElementById("outputFile").value;
             if (!inputFile || !outputFile) {
                 alert("Please enter both input and output file names");
+                enableStartButton();
                 return;
             }
-
-            fetch(`http://localhost:8080/start?inputFile=${inputFile}&outputFile=${outputFile}`, {
-                method: "POST"
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    outputDiv.innerText += "\n" + data + "\n";
-                })
-                .catch(error => {
-                    console.error("Error starting simulation: ", error);
-                    outputDiv.innerText += "\nError: " + error.message + "\n";
-                });
+            url = `http://localhost:8080/start?inputFile=${inputFile}&outputFile=${outputFile}`;
         } else {
             const numberOfCommands = document.getElementById("numberOfCommands").value || 10;
-
-            fetch(`http://localhost:8080/start-random?numberOfCommands=${numberOfCommands}`, {
-                method: "POST"
-            })
-                .then(response => response.text())
-                .then(data => {
-                    outputDiv.innerText += "\n" + data + "\n";
-                })
-                .catch(error => console.error("Error starting simulation: ", error));
+            url = `http://localhost:8080/start-random?numberOfCommands=${numberOfCommands}`;
         }
+
+        fetch(url, { method: "POST" })
+            .catch(error => {
+                console.error("Error starting simulation:", error);
+                outputDiv.innerText += "\nError: " + error.message + "\n";
+                scrollToBottom();
+                enableStartButton();
+            });
     });
-
-
-
 });

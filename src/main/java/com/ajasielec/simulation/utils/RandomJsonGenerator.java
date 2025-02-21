@@ -1,8 +1,8 @@
 package com.ajasielec.simulation.utils;
 
-import com.ajasielec.simulation.models.Command;
-import com.ajasielec.simulation.models.CommandList;
-import com.ajasielec.simulation.models.RandomCommandGenerator;
+import com.ajasielec.simulation.dto.Command;
+import com.ajasielec.simulation.dto.CommandList;
+import com.ajasielec.simulation.services.RandomCommandGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -12,16 +12,15 @@ import java.util.List;
 
 public class RandomJsonGenerator {
     public static void generateRandomJson(String filepath, int numberOfCommands) throws IOException {
-        CommandList commandList = new CommandList();
-        List<Command> commands = new ArrayList<Command>();
+        List<Command> commands = new ArrayList<>();
 
         for (int i = 0; i < numberOfCommands; i++) {
             commands.add(RandomCommandGenerator.generateRandomCommand());
         }
 
+        CommandList commandList = CommandList.getInstance();
         commandList.setCommands(commands);
 
-        // serialize and write to file
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(new File(filepath), commandList);
     }
