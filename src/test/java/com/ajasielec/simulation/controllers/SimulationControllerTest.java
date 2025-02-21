@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -43,17 +44,18 @@ public class SimulationControllerTest {
         Files.writeString(tempInputPath, "{}");
 
         try {
-            Simulation simulation = new Simulation(inputFile, outputFile, messagingTemplate);
-            Simulation spySimulation = spy(simulation);
+            try (MockedConstruction<Simulation> mocked = mockConstruction(Simulation.class)) {
+                ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
 
-            doNothing().when(spySimulation).startSimulation();
+                assertEquals(1, mocked.constructed().size());
 
-            ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
+                Simulation mockSimulation = mocked.constructed().get(0);
 
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertTrue(Objects.requireNonNull(response.getBody()).contains("Simulation completed"));
-            verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
-            verify(spySimulation).startSimulation();
+                assertEquals(HttpStatus.OK, response.getStatusCode());
+                assertTrue(Objects.requireNonNull(response.getBody()).contains("Simulation completed"));
+                verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
+                verify(mockSimulation).startSimulation();
+            }
         } finally {
             Files.deleteIfExists(tempInputPath);
         }
@@ -73,13 +75,18 @@ public class SimulationControllerTest {
 
     @Test
     void testStartRandomSimulation() throws IOException {
-        try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class)) {
-            Simulation simulation = new Simulation("randomInput.json", "randomOutput.json", messagingTemplate);
-            Simulation spySimulation = spy(simulation);
+        try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class);
+             MockedConstruction<Simulation> mocked = mockConstruction(Simulation.class)) {
 
-            doNothing().when(spySimulation).startSimulation();
+            generatorStatic.when(() ->
+                            RandomJsonGenerator.generateRandomJson(contains("randomInput.json"), eq(5)))
+                    .thenAnswer(invocation -> null);
 
             String result = controller.startRandomSimulation(5);
+
+            assertEquals(1, mocked.constructed().size());
+
+            Simulation mockSimulation = mocked.constructed().get(0);
 
             assertTrue(result.contains("Simulation completed"));
             verify(messagingTemplate).convertAndSend(eq("/topic/status"), eq("Simulation started with random JSON"));
@@ -87,7 +94,7 @@ public class SimulationControllerTest {
             generatorStatic.verify(() ->
                     RandomJsonGenerator.generateRandomJson(contains("randomInput.json"), eq(5)));
 
-            verify(spySimulation).startSimulation();
+            verify(mockSimulation).startSimulation();
         }
     }
 

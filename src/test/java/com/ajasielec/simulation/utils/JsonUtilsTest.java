@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class JsonUtilsTest {
     @BeforeEach
     void resetSingleton() {
-        CommandList.getInstance().getCommands().clear();
+        CommandList.getInstance().setCommands(new ArrayList<>());
     }
 
     @Test
