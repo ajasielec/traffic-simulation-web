@@ -23,12 +23,18 @@ document.addEventListener("DOMContentLoaded", function () {
         stompClient.subscribe('/topic/status', function (message) {
             console.log('Received:', message.body);
             outputDiv.innerText += message.body + "\n";
-            outputDiv.scrollTop = outputDiv.scrollHeight;
+            setTimeout(() => {
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }, 10);
         });
     }, function(error) {
         console.error('STOMP error:', error);
         outputDiv.innerText = "Connection error: " + error;
     });
+
+    function scrollToBottom() {
+        outputDiv.scrollTop = outputDiv.scrollHeight;
+    }
 
     uploadBtn.addEventListener("click", function () {
         fileInputSection.style.display = "block";
@@ -68,10 +74,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .then(data => {
                     outputDiv.innerText += "\n" + data + "\n";
+                    scrollToBottom();
                 })
                 .catch(error => {
                     console.error("Error starting simulation: ", error);
                     outputDiv.innerText += "\nError: " + error.message + "\n";
+                    scrollToBottom();
                 });
         } else {
             const numberOfCommands = document.getElementById("numberOfCommands").value || 10;
@@ -82,8 +90,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(response => response.text())
                 .then(data => {
                     outputDiv.innerText += "\n" + data + "\n";
+                    scrollToBottom();
                 })
-                .catch(error => console.error("Error starting simulation: ", error));
+                .catch(error => {
+                    console.error("Error starting simulation: ", error);
+                    outputDiv.innerText += "\nError: " + error.message + "\n";
+                    scrollToBottom();
+                });
         }
     });
 });
