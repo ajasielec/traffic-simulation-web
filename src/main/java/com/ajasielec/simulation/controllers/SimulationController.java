@@ -32,16 +32,15 @@ public class SimulationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
 
-        messagingTemplate.convertAndSend("/topic/status", "Simulation started with " + inputPath);
-
         try {
             Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
             simulation.startSimulation();
+            messagingTemplate.convertAndSend("/topic/status", "\nSimulation completed!\n");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Simulation failed: " + e.getMessage());
         }
 
-        String successMessage = "Simulation completed! Results saved to " + outputPath;
+        String successMessage = "Simulation completed!\n";
 
         return ResponseEntity.ok(successMessage);
     }
@@ -53,11 +52,11 @@ public class SimulationController {
 
         RandomJsonGenerator.generateRandomJson(inputPath, numberOfCommands);
 
-        messagingTemplate.convertAndSend("/topic/status", "Simulation started with random JSON");
-
         Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
         simulation.startSimulation();
 
-        return "Simulation completed! Results saved to " + outputPath;
+        messagingTemplate.convertAndSend("/topic/status", "\nSimulation completed!\n");
+
+        return "Simulation completed!\n";
     }
 }
