@@ -12,82 +12,79 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Simulation extends AbstractMessageSender {
-    private static Simulation instance;
-    private String inputFile;
-    private String outputFile;
+    private static final Logger LOGGER = Logger.getLogger(Simulation.class.getName());
+    private final String inputFile;
+    private final String outputFile;
+    private final Intersection intersection;
 
-    private Simulation(String inputFile, String outputFile) {
+    public Simulation(String inputFile, String outputFile) {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
+        this.intersection = new Intersection();
     }
 
-    public static synchronized Simulation getInstance(String inputFile, String outputFile) {
-        if (instance == null) {
-            instance = new Simulation(inputFile, outputFile);
-        }
-        return instance;
-    }
-
-    public static synchronized Simulation getInstance(String inputFile, String outputFile, SimpMessagingTemplate messagingTemplate) {
-        if (instance == null) {
-            instance = new Simulation(inputFile, outputFile);
-        } else {
-            instance.updateFiles(inputFile, outputFile);
-        }
-        instance.setMessagingTemplate(messagingTemplate);
-        return instance;
-    }
-
-    private void updateFiles(String inputFile, String outputFile) {
+    public Simulation(String inputFile, String outputFile, SimpMessagingTemplate messagingTemplate) {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
+        this.messagingTemplate = messagingTemplate;
+        this.intersection = new Intersection();
+        this.intersection.setMessagingTemplate(messagingTemplate);
     }
+
 
     public void startSimulation() {
         try {
-            Intersection intersection = Intersection.getInstance();
-            intersection.setMessagingTemplate(messagingTemplate);
             SimulationResult simulationResult = new SimulationResult();
             CommandList commandList = CommandList.getInstance();
             commandList.loadCommands(inputFile);
 
             for (Command command : commandList.getCommands()) {
-                executeCommand(command, intersection, simulationResult);
+                executeCommand(command, simulationResult);
             }
 
             JsonUtils.serializeResult(simulationResult, outputFile);
             sendMessage("Simulation results saved to: " + outputFile);
-
         } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error reading or writing files: ", e);
             sendMessage("Error reading or writing files: " + e.getMessage());
-            e.printStackTrace();
         } catch (IllegalArgumentException e) {
-            sendMessage("Invalid command or direction: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Invalid command or direction: ", e);
+            sendMessage("Invalid input: " + e.getMessage());
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            LOGGER.log(Level.SEVERE, "Simulation interrupted: ", e);
+            sendMessage("Simulation was interrupted.");
         }
     }
 
-    private void executeCommand(Command command, Intersection intersection, SimulationResult simulationResult) throws InterruptedException {
+    private void executeCommand(Command command, SimulationResult simulationResult) throws InterruptedException {
         switch (command.getType()) {
             case "addVehicle":
-                Direction start = Direction.valueOf(command.getStartRoad().toUpperCase());
-                Direction end = Direction.valueOf(command.getEndRoad().toUpperCase());
-                Vehicle vehicle = new Vehicle(command.getVehicleId(), start, end);
-                intersection.addVehicle(vehicle);
-                sendMessage("Added vehicle: " + vehicle + " on " + start + " road.");
+                addVehicle(command);
                 break;
             case "step":
-                List<String> leftVehicles = intersection.step();
-                simulationResult.addStepStatus(new StepStatus(leftVehicles));
-                sendMessage("Step status (left vehicles): " + leftVehicles);
+                step(simulationResult);
                 break;
             default:
                 sendMessage("Unknown command type: " + command.getType());
-                break;
         }
+    }
+
+    private void addVehicle(Command command) {
+        Direction start = Direction.valueOf(command.getStartRoad().toUpperCase());
+        Direction end = Direction.valueOf(command.getEndRoad().toUpperCase());
+        Vehicle vehicle = new Vehicle(command.getVehicleId(), start, end);
+        intersection.addVehicle(vehicle);
+        sendMessage("Added vehicle: " + vehicle + " on " + start + " road.");
+    }
+
+    private void step(SimulationResult simulationResult) throws InterruptedException {
+        List<String> leftVehicles = intersection.step();
+        simulationResult.addStepStatus(new StepStatus(leftVehicles));
+        sendMessage("Step status (left vehicles): " + leftVehicles);
     }
 }

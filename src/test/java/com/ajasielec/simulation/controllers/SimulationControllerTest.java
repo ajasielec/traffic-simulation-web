@@ -27,15 +27,17 @@ public class SimulationControllerTest {
     @Mock
     private SimpMessagingTemplate messagingTemplate;
 
+    @Mock
+    private Simulation mockSimulation;
+
     @InjectMocks
     private SimulationController controller;
-
-    private final String resourcePath = "src/main/resources/";
 
     @Test
     void testStartSimulation_FileExists() throws Exception {
         String inputFile = "testInput.json";
         String outputFile = "testOutput.json";
+        String resourcePath = "src/main/resources/";
         String inputPath = Paths.get(resourcePath, inputFile).toString();
 
         Path tempInputPath = Paths.get(inputPath);
@@ -43,20 +45,17 @@ public class SimulationControllerTest {
         Files.writeString(tempInputPath, "{}");
 
         try {
-            Simulation mockSimulation = mock(Simulation.class);
+            Simulation simulation = new Simulation(inputFile, outputFile, messagingTemplate);
+            Simulation spySimulation = spy(simulation);
 
-            try (MockedStatic<Simulation> simulationStatic = mockStatic(Simulation.class)) {
-                simulationStatic.when(() ->
-                                Simulation.getInstance(anyString(), anyString(), any(SimpMessagingTemplate.class)))
-                        .thenReturn(mockSimulation);
+            doNothing().when(spySimulation).startSimulation();
 
-                ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
+            ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
 
-                assertEquals(HttpStatus.OK, response.getStatusCode());
-                assertTrue(response.getBody().contains("Simulation completed"));
-                verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
-                verify(mockSimulation).startSimulation();
-            }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertTrue(response.getBody().contains("Simulation completed"));
+            verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
+            verify(spySimulation).startSimulation();
         } finally {
             Files.deleteIfExists(tempInputPath);
         }
@@ -76,13 +75,11 @@ public class SimulationControllerTest {
 
     @Test
     void testStartRandomSimulation() throws IOException {
-        try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class);
-             MockedStatic<Simulation> simulationStatic = mockStatic(Simulation.class)) {
+        try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class)) {
+            Simulation simulation = new Simulation("randomInput.json", "randomOutput.json", messagingTemplate);
+            Simulation spySimulation = spy(simulation);
 
-            Simulation mockSimulation = mock(Simulation.class);
-            simulationStatic.when(() ->
-                            Simulation.getInstance(anyString(), anyString(), any(SimpMessagingTemplate.class)))
-                    .thenReturn(mockSimulation);
+            doNothing().when(spySimulation).startSimulation();
 
             String result = controller.startRandomSimulation(5);
 
@@ -92,7 +89,7 @@ public class SimulationControllerTest {
             generatorStatic.verify(() ->
                     RandomJsonGenerator.generateRandomJson(contains("randomInput.json"), eq(5)));
 
-            verify(mockSimulation).startSimulation();
+            verify(spySimulation).startSimulation();
         }
     }
 

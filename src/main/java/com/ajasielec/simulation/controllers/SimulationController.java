@@ -32,7 +32,7 @@ public class SimulationController {
 
         messagingTemplate.convertAndSend("/topic/status", "Simulation started with " + inputPath);
 
-        Simulation simulation = Simulation.getInstance(inputPath, outputPath, messagingTemplate);
+        Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
         simulation.startSimulation();
 
         String successMessage = "Simulation completed! Results saved to " + outputPath;
@@ -49,7 +49,7 @@ public class SimulationController {
 
         messagingTemplate.convertAndSend("/topic/status", "Simulation started with random JSON");
 
-        Simulation simulation = Simulation.getInstance(inputPath, outputPath, messagingTemplate);
+        Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
         simulation.startSimulation();
 
         return "Simulation completed! Results save to " + outputPath;

@@ -17,7 +17,7 @@ public class SimulationTest {
         TrafficLight light = new TrafficLight();
         light.setTestMode(true);
 
-        Intersection intersection = Intersection.getInstance();
+        Intersection intersection = new Intersection();
         intersection.setTestMode(true);
 
         // add vehicles and perform simulation steps

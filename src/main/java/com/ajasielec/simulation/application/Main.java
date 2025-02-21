@@ -23,13 +23,20 @@ public class Main {
             System.out.println("Enter number of commands to generate:");
 
             Scanner scanner = new Scanner(System.in);
-            int numberOfCommands = scanner.nextInt();
+            int numberOfCommands = 10;
+            try {
+                numberOfCommands = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Invalid input. Using default value (10).");
+            } finally {
+                scanner.close();
+            }
+
             RandomJsonGenerator.generateRandomJson(inputPath, numberOfCommands);
             scanner.close();
         }
 
-        // start the simulation
-        Simulation simulation = Simulation.getInstance(inputPath, outputPath);
+        Simulation simulation = new Simulation(inputPath, outputPath);
         simulation.startSimulation();
     }
 
@@ -48,6 +55,6 @@ public class Main {
     }
 
     private static String buildPath(String fileName) {
-        return Paths.get(RESOURCE_PATH, fileName).toString();
+        return Paths.get(RESOURCE_PATH, fileName).toAbsolutePath().toString();
     }
 }

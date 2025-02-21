@@ -12,7 +12,6 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 public class Intersection extends AbstractMessageSender {
-    private static final Intersection instance = new Intersection();
     private static boolean isTestMode = false;
 
     private final Queue<Vehicle> northQueue = new LinkedList<>();
@@ -23,10 +22,12 @@ public class Intersection extends AbstractMessageSender {
     private final TrafficLight northSouthLight = new TrafficLight(LightColor.RED, TrafficCycle.NORTH_SOUTH);
     private final TrafficLight eastWestLight = new TrafficLight(LightColor.GREEN, TrafficCycle.EAST_WEST);
 
-    private Intersection() {}
+    public Intersection() {}
 
-    public static Intersection getInstance() {
-        return instance;
+    public Intersection(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+        northSouthLight.setMessagingTemplate(messagingTemplate);
+        eastWestLight.setMessagingTemplate(messagingTemplate);
     }
 
     public void setTestMode(boolean testMode) {
