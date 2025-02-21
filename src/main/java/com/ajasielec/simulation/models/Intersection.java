@@ -84,11 +84,4 @@ public class Intersection extends AbstractMessageSender {
             }
         }
     }
-
-    public void printQueues(){
-        System.out.println("North queue: " + northQueue);
-        System.out.println("South queue: " + southQueue);
-        System.out.println("East queue: " + eastQueue);
-        System.out.println("West queue: " + westQueue);
-    }
 }
