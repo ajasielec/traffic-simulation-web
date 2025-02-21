@@ -4,33 +4,35 @@ import com.ajasielec.simulation.utils.JsonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandList {
-    private static CommandList instance;
-    private List<Command> commands;
+    private static final CommandList instance = new CommandList();
+    private final List<Command> commands = Collections.synchronizedList(new ArrayList<>());
 
-    public CommandList() {
-        commands = new ArrayList<>();
-    }
+    private CommandList() {}
 
-    public static synchronized CommandList getInstance() {
-        if (instance == null) {
-            instance = new CommandList();
-        }
+    public static CommandList getInstance() {
         return instance;
     }
 
     public List<Command> getCommands() {
-        return commands;
+        return Collections.unmodifiableList(commands);
     }
 
     public void loadCommands(String fileName) throws IOException {
         CommandList loaded = JsonUtils.deserializeCommands(fileName);
-        this.commands = loaded.getCommands();
+        synchronized (commands) {
+            commands.clear();
+            commands.addAll(loaded.getCommands());
+        }
     }
 
-    public void setCommands(List<Command> commands) {
-        this.commands = commands;
+    public void setCommands(List<Command> newCommands) {
+        synchronized (commands) {
+            commands.clear();
+            commands.addAll(newCommands);
+        }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 public class Intersection extends AbstractMessageSender {
-    private static boolean isTestMode = false;
+    private boolean isTestMode = false;
 
     private final Queue<Vehicle> northQueue = new LinkedList<>();
     private final Queue<Vehicle> southQueue = new LinkedList<>();
@@ -42,7 +42,7 @@ public class Intersection extends AbstractMessageSender {
     }
 
     public void addVehicle (Vehicle vehicle) {
-        switch (vehicle.getStartRoad()) {
+        switch (vehicle.startRoad()) {
             case NORTH -> northQueue.add(vehicle);
             case SOUTH -> southQueue.add(vehicle);
             case EAST -> eastQueue.add(vehicle);
@@ -52,16 +52,14 @@ public class Intersection extends AbstractMessageSender {
 
     public List<String> step() throws InterruptedException {
         List<String> leftVehicles = new ArrayList<>();
+        boolean isNorthSouth = shouldSwitchToNorthSouth();
 
-        if (shouldSwitchToNorthSouth()) {
-            switchLights(northSouthLight, eastWestLight);
-            processQueue(northQueue, leftVehicles);
-            processQueue(southQueue, leftVehicles);
-        } else {
-            switchLights(eastWestLight, northSouthLight);
-            processQueue(eastQueue, leftVehicles);
-            processQueue(westQueue, leftVehicles);
-        }
+        switchLights(isNorthSouth ? northSouthLight : eastWestLight,
+                isNorthSouth ? eastWestLight : northSouthLight);
+
+        processQueue(isNorthSouth ? northQueue : eastQueue, leftVehicles);
+        processQueue(isNorthSouth ? southQueue : westQueue, leftVehicles);
+
         return leftVehicles;
     }
 
@@ -77,9 +75,9 @@ public class Intersection extends AbstractMessageSender {
     }
 
     private void processQueue(Queue<Vehicle> queue, List<String> leftVehicles) throws InterruptedException {
-        if (!queue.isEmpty()) {
-            Vehicle vehicle = queue.poll();
-            leftVehicles.add(vehicle.getId());
+        Vehicle vehicle = queue.poll();
+        if (vehicle != null) {
+            leftVehicles.add(vehicle.id());
             if (!isTestMode){
                 sendMessage(vehicle + " left intersection.");
                 TimeUnit.SECONDS.sleep(2);

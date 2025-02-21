@@ -1,18 +1,32 @@
 package com.ajasielec.simulation.dto;
 
 public class Command {
-    private String type;
-    private String vehicleId;
-    private String startRoad;
-    private String endRoad;
+    private final String type;
+    private final String vehicleId;
+    private final String startRoad;
+    private final String endRoad;
 
-    public Command() {}
+    public Command() {
+        this.type = null;
+        this.vehicleId = null;
+        this.startRoad = null;
+        this.endRoad = null;
+    }
 
     public Command(String type) {
+        if (type == null || type.isBlank()) {
+            throw new IllegalArgumentException("Command type cannot be null or empty.");
+        }
         this.type = type;
+        this.vehicleId = null;
+        this.startRoad = null;
+        this.endRoad = null;
     }
 
     public Command(String type, String vehicleId, String startRoad, String endRoad) {
+        if (type == null || type.isBlank()) {
+            throw new IllegalArgumentException("Command type cannot be null or empty.");
+        }
         this.type = type;
         this.vehicleId = vehicleId;
         this.startRoad = startRoad;
@@ -23,9 +37,4 @@ public class Command {
     public String getVehicleId(){return vehicleId;}
     public String getStartRoad(){return startRoad;}
     public String getEndRoad(){return endRoad;}
-
-    public void setType(String type){this.type = type;}
-    public void setVehicleId(String vehicleId){this.vehicleId = vehicleId;}
-    public void setStartRoad(String startRoad){this.startRoad = startRoad;}
-    public void setEndRoad(String endRoad){this.endRoad = endRoad;}
 }

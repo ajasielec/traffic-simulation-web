@@ -2,7 +2,6 @@ package com.ajasielec.simulation.controllers;
 
 import com.ajasielec.simulation.application.Simulation;
 import com.ajasielec.simulation.utils.RandomJsonGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,8 +15,11 @@ import java.nio.file.Paths;
 public class SimulationController {
     private static final String RESOURCE_PATH = "src/main/resources/";
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public SimulationController(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @PostMapping("/start")
     public ResponseEntity<String> startSimulation(@RequestParam String inputFile, @RequestParam String outputFile) {
@@ -32,8 +34,12 @@ public class SimulationController {
 
         messagingTemplate.convertAndSend("/topic/status", "Simulation started with " + inputPath);
 
-        Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
-        simulation.startSimulation();
+        try {
+            Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
+            simulation.startSimulation();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Simulation failed: " + e.getMessage());
+        }
 
         String successMessage = "Simulation completed! Results saved to " + outputPath;
 
@@ -52,7 +58,7 @@ public class SimulationController {
         Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
         simulation.startSimulation();
 
-        return "Simulation completed! Results save to " + outputPath;
+        return "Simulation completed! Results saved to " + outputPath;
     }
 
 }

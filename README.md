@@ -100,5 +100,5 @@ When running the backend, you can start the simulation via the web interface:
 * **SimulationController (REST API)** - Starts a simulation or a random JSON-based simulation. Sends status updates via WebSocket.
 * **WebSocketController** - Handles WebSocket messages and broadcasts updates to /topic/status.
 ### config
-* **CorsConfig** - Enables CORS for http://localhost:63342, allowing common HTTP methods.
+* **CorsConfig** - Enables CORS, allowing common HTTP methods.
 * **WebSocketConfig** - Configures WebSocket with STOMP, /topic broker, /app prefix, and /ws endpoint (SockJS supported).

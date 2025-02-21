@@ -64,10 +64,10 @@ public class JsonUtilsTest {
         assertEquals(4, deserializedResult.getStepStatuses().size());
 
         // verify each step status
-        assertEquals(List.of("vehicle2", "vehicle1"), deserializedResult.getStepStatuses().get(0).getLeftVehicles());
-        assertEquals(List.of(), deserializedResult.getStepStatuses().get(1).getLeftVehicles());
-        assertEquals(List.of("vehicle3"), deserializedResult.getStepStatuses().get(2).getLeftVehicles());
-        assertEquals(List.of("vehicle4"), deserializedResult.getStepStatuses().get(3).getLeftVehicles());
+        assertEquals(List.of("vehicle2", "vehicle1"), deserializedResult.getStepStatuses().get(0).leftVehicles());
+        assertEquals(List.of(), deserializedResult.getStepStatuses().get(1).leftVehicles());
+        assertEquals(List.of("vehicle3"), deserializedResult.getStepStatuses().get(2).leftVehicles());
+        assertEquals(List.of("vehicle4"), deserializedResult.getStepStatuses().get(3).leftVehicles());
     }
 
 }
