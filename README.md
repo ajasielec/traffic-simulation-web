@@ -102,3 +102,9 @@ When running the backend, you can start the simulation via the web interface:
 ### config
 * **CorsConfig** - Enables CORS, allowing common HTTP methods.
 * **WebSocketConfig** - Configures WebSocket with STOMP, /topic broker, /app prefix, and /ws endpoint (SockJS supported).
+### test
+* **SimulationTest** -  Tests the step-by-step simulation of vehicle movement at an intersection, ensuring proper vehicle flow and traffic light handling.
+* **SimulationControllerTest** - Unit tests for SimulationController verify file existence, successful simulation start, random simulation generation, and proper exception handling.
+* **WebSocketControllerTest** - Tests sendSimulationStatus method with different inputs ("running", "stopped", and empty string) in WebSocketController.
+* **JsonUtilsTest** - Tests JsonUtils methods for deserializing commands from a JSON file and serializing the simulation result to a JSON file, verifying correct data parsing and writing.
+* **TrafficSimulationWebApplicationTests** - Tests if the Spring Boot application context loads correctly.

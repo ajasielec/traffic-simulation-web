@@ -27,7 +27,6 @@ public class JsonUtilsTest {
         CommandList commandList = CommandList.getInstance();
         commandList.loadCommands(inputFilePath);
 
-        // verify that the commands were read correctly
         assertNotNull(commandList);
         assertEquals(8, commandList.getCommands().size());
         assertEquals("addVehicle", commandList.getCommands().get(0).getType());
@@ -38,36 +37,28 @@ public class JsonUtilsTest {
 
     @Test
     void testSerializeResult() throws IOException {
-        // create a sample SimulationResult
         SimulationResult simulationResult = new SimulationResult();
         simulationResult.addStepStatus(new StepStatus(List.of("vehicle2", "vehicle1")));
         simulationResult.addStepStatus(new StepStatus(List.of()));
         simulationResult.addStepStatus(new StepStatus(List.of("vehicle3")));
         simulationResult.addStepStatus(new StepStatus(List.of("vehicle4")));
 
-        // path to the output JSON file
         String outputFilePath = "src/test/resources/output.json";
 
-        // serialize the result
         JsonUtils.serializeResult(simulationResult, outputFilePath);
 
-        // verify that the file was created
         File outputFile = new File(outputFilePath);
         assertTrue(outputFile.exists());
 
-        // deserialize the output file to verify its content
         ObjectMapper objectMapper = new ObjectMapper();
         SimulationResult deserializedResult = objectMapper.readValue(outputFile, SimulationResult.class);
 
-        // verify the deserialized result
         assertNotNull(deserializedResult);
         assertEquals(4, deserializedResult.getStepStatuses().size());
 
-        // verify each step status
         assertEquals(List.of("vehicle2", "vehicle1"), deserializedResult.getStepStatuses().get(0).leftVehicles());
         assertEquals(List.of(), deserializedResult.getStepStatuses().get(1).leftVehicles());
         assertEquals(List.of("vehicle3"), deserializedResult.getStepStatuses().get(2).leftVehicles());
         assertEquals(List.of("vehicle4"), deserializedResult.getStepStatuses().get(3).leftVehicles());
     }
-
 }

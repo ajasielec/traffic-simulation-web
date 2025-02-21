@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -26,9 +27,6 @@ public class SimulationControllerTest {
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
-
-    @Mock
-    private Simulation mockSimulation;
 
     @InjectMocks
     private SimulationController controller;
@@ -53,7 +51,7 @@ public class SimulationControllerTest {
             ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertTrue(response.getBody().contains("Simulation completed"));
+            assertTrue(Objects.requireNonNull(response.getBody()).contains("Simulation completed"));
             verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
             verify(spySimulation).startSimulation();
         } finally {
@@ -69,7 +67,7 @@ public class SimulationControllerTest {
         ResponseEntity<String> response = controller.startSimulation(inputFile, outputFile);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody().contains("Input file not found"));
+        assertTrue(Objects.requireNonNull(response.getBody()).contains("Input file not found"));
         verify(messagingTemplate).convertAndSend(anyString(), contains("Input file not found"));
     }
 
@@ -94,7 +92,7 @@ public class SimulationControllerTest {
     }
 
     @Test
-    void testStartRandomSimulation_GeneratorThrowsException() throws IOException {
+    void testStartRandomSimulation_GeneratorThrowsException() {
         try (MockedStatic<RandomJsonGenerator> generatorStatic = mockStatic(RandomJsonGenerator.class)) {
             generatorStatic.when(() -> RandomJsonGenerator.generateRandomJson(anyString(), anyInt()))
                     .thenThrow(new IOException("Test IO exception"));
