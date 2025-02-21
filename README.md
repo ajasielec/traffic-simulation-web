@@ -21,7 +21,7 @@ mvn exec:java "-Dexec.args=input.json output.json"
 ```
 **Note: Ensure that the JSON input file is located in the *src/main/resources* folder.**
 
-If no arguments are provided, the program will generate a random simulation with 10 commands by default:
+If no arguments are provided, the program will generate a random simulation with number of commands specified by user:
 ```
 mvn exec:java
 ```
@@ -41,7 +41,7 @@ To launch the backend server, run:
 mvn spring-boot:run
 ```
 Once the backend is running, access the simulation at:
-http://localhost:8080
+http://localhost:8080 or http://localhost:63342
 
 
 ## How It Works
@@ -73,30 +73,32 @@ When running the backend, you can start the simulation via the web interface:
 
 
 ## Project structure
-## application
-* Main
-* Simulation
+### application
+* **Main** - The entry point of the application. It loads input/output file names, generates random input if needed, and starts the simulation.
+* **Simulation** - Manages the simulation process. It loads commands from a file, executes them step by step, and saves results. It also supports real-time messaging via WebSockets.
 ### enums
-* Direction
-* LightColor
-* TrafficCycle
+* **Direction** - Represents the four cardinal directions (NORTH, EAST, SOUTH, WEST).
+* **LightColor** - Defines traffic light states (GREEN, YELLOW, RED).
+* **TrafficCycle** - Specifies which direction has the right of way (NORTH_SOUTH, EAST_WEST).
 ### models
-* RandomCommandGenerator
-* Intersection
-* Vehicle
-* TrafficLight
-* Command
-* CommandList
-* StepStatus
-* SimulationResult
-* MessageSender
-* AbstractMessageSender
+* **Intersection** - Manages vehicle queues, controls traffic light switching, and simulates traffic flow.
+* **TrafficLight** - Represents a traffic light with a color and cycle, handling transitions between states.
+* **Vehicle** - Represents a vehicle with a unique ID, an entry direction, and an exit direction.
+### dto
+* **Command** - Represents a traffic command with type, vehicle ID, start, and end roads.
+* **CommandList** - Singleton managing a list of commands, supports JSON loading.
+* **StepStatus** - Tracks vehicles that left the intersection in a step.
+* **SimulationResult** - Stores step-by-step simulation results
+### services
+* **RandomCommandGenerator** - Creates random "addVehicle" (with ID, start/end road) or "step" commands.
+* **MessageSender** -  Interface for sending messages.
+* **AbstractMessageSender** - Sends messages via SimpMessagingTemplate or prints them.
 ### utils
-* JsonUtils
-* RandomJsonGenerator
+* **JsonUtils** - Handles JSON serialization/deserialization for CommandList and SimulationResult using ObjectMapper.
+* **RandomJsonGenerator** - Generates a JSON file with random commands, using RandomCommandGenerator and saving via ObjectMapper.
 ### controllers
-* SimulationController
-* WebSocketController
+* **SimulationController (REST API)** - Starts a simulation or a random JSON-based simulation. Sends status updates via WebSocket.
+* **WebSocketController** - Handles WebSocket messages and broadcasts updates to /topic/status.
 ### config
-* CorsConfig
-* WebSocketConfig
+* **CorsConfig** - Enables CORS for http://localhost:63342, allowing common HTTP methods.
+* **WebSocketConfig** - Configures WebSocket with STOMP, /topic broker, /app prefix, and /ws endpoint (SockJS supported).
