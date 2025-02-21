@@ -1,8 +1,8 @@
 package com.ajasielec.simulation.utils;
 
-import com.ajasielec.simulation.models.Command;
-import com.ajasielec.simulation.models.CommandList;
-import com.ajasielec.simulation.models.RandomCommandGenerator;
+import com.ajasielec.simulation.dto.Command;
+import com.ajasielec.simulation.dto.CommandList;
+import com.ajasielec.simulation.services.RandomCommandGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;

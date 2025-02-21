@@ -1,4 +1,4 @@
-package com.ajasielec.simulation.models;
+package com.ajasielec.simulation.dto;
 
 public class Command {
     private String type;

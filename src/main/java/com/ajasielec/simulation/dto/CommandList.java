@@ -1,4 +1,4 @@
-package com.ajasielec.simulation.models;
+package com.ajasielec.simulation.dto;
 
 import com.ajasielec.simulation.utils.JsonUtils;
 

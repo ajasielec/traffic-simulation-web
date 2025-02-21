@@ -1,8 +1,8 @@
 package com.ajasielec.simulation.utils;
 
-import com.ajasielec.simulation.models.CommandList;
-import com.ajasielec.simulation.models.SimulationResult;
-import com.ajasielec.simulation.models.StepStatus;
+import com.ajasielec.simulation.dto.CommandList;
+import com.ajasielec.simulation.dto.SimulationResult;
+import com.ajasielec.simulation.dto.StepStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

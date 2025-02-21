@@ -2,7 +2,7 @@ package com.ajasielec.simulation.models;
 
 import com.ajasielec.simulation.enums.LightColor;
 import com.ajasielec.simulation.enums.TrafficCycle;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.ajasielec.simulation.services.AbstractMessageSender;
 
 import java.util.concurrent.TimeUnit;
 

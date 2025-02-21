@@ -1,4 +1,4 @@
-package com.ajasielec.simulation.models;
+package com.ajasielec.simulation.services;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 

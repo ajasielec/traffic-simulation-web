@@ -1,4 +1,6 @@
-package com.ajasielec.simulation.models;
+package com.ajasielec.simulation.services;
+
+import com.ajasielec.simulation.dto.Command;
 
 import java.util.Random;
 
