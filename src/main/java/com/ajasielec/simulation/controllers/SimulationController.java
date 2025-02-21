@@ -60,5 +60,4 @@ public class SimulationController {
 
         return "Simulation completed! Results saved to " + outputPath;
     }
-
 }

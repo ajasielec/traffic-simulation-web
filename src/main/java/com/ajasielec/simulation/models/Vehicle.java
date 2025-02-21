@@ -16,4 +16,8 @@ public record Vehicle (String id, Direction startRoad, Direction endRoad) {
     public String toString() {
         return "Vehicle {id=" + id + ", startRoad=" + startRoad + ", endRoad=" + endRoad + "}";
     }
+
+    public Object getId() {
+        return id;
+    }
 }

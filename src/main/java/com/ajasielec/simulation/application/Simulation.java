@@ -38,6 +38,7 @@ public class Simulation extends AbstractMessageSender {
 
     public void startSimulation() {
         try {
+            sendMessage("Simulation started with " + inputFile);
             SimulationResult simulationResult = new SimulationResult();
             CommandList commandList = CommandList.getInstance();
             commandList.loadCommands(inputFile);
@@ -79,12 +80,14 @@ public class Simulation extends AbstractMessageSender {
         Direction end = Direction.valueOf(command.getEndRoad().toUpperCase());
         Vehicle vehicle = new Vehicle(command.getVehicleId(), start, end);
         intersection.addVehicle(vehicle);
-        sendMessage("Added vehicle: " + vehicle + " on " + start + " road.");
+
+        sendMessage(String.format("Vehicle %s added on %s road, heading to %s.", vehicle.getId(), start, end));
     }
 
     private void step(SimulationResult simulationResult) throws InterruptedException {
         List<String> leftVehicles = intersection.step();
         simulationResult.addStepStatus(new StepStatus(leftVehicles));
-        sendMessage("Step status (left vehicles): " + leftVehicles);
+
+        sendMessage(String.format("Step completed. Vehicles left the intersection: %s", leftVehicles.isEmpty() ? "None" : String.join(", ", leftVehicles)));
     }
 }
