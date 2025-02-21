@@ -32,6 +32,8 @@ public class SimulationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
 
+        messagingTemplate.convertAndSend("/topic/status", "Starting a simulation...");
+
         try {
             Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
             simulation.startSimulation();
@@ -51,6 +53,8 @@ public class SimulationController {
         String outputPath = Paths.get(RESOURCE_PATH, "randomOutput.json").toString();
 
         RandomJsonGenerator.generateRandomJson(inputPath, numberOfCommands);
+
+        messagingTemplate.convertAndSend("/topic/status", "Starting a simulation...");
 
         Simulation simulation = new Simulation(inputPath, outputPath, messagingTemplate);
         simulation.startSimulation();

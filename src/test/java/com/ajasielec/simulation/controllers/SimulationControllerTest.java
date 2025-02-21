@@ -53,7 +53,7 @@ public class SimulationControllerTest {
 
                 assertEquals(HttpStatus.OK, response.getStatusCode());
                 assertTrue(Objects.requireNonNull(response.getBody()).contains("Simulation completed"));
-                verify(messagingTemplate).convertAndSend(anyString(), contains("Simulation started"));
+                verify(messagingTemplate).convertAndSend(anyString(), contains("Starting a simulation..."));
                 verify(mockSimulation).startSimulation();
             }
         } finally {
@@ -89,7 +89,7 @@ public class SimulationControllerTest {
             Simulation mockSimulation = mocked.constructed().get(0);
 
             assertTrue(result.contains("Simulation completed"));
-            verify(messagingTemplate).convertAndSend(eq("/topic/status"), eq("Simulation started with random JSON"));
+            verify(messagingTemplate).convertAndSend(eq("/topic/status"), eq("Starting a simulation..."));
 
             generatorStatic.verify(() ->
                     RandomJsonGenerator.generateRandomJson(contains("randomInput.json"), eq(5)));
