@@ -43,7 +43,7 @@ mvn spring-boot:run
 Once the backend is running, access the simulation at:
 http://localhost:8080 or http://localhost:63342
 
-**This is how it looks like:**
+**Here's a preview of how it looks:**
 ![simulationWeb](https://github.com/user-attachments/assets/d9f56246-4a7d-49ca-84cd-7f77a6802c82)
 
 
