@@ -79,7 +79,7 @@ public class Intersection extends AbstractMessageSender {
         if (vehicle != null) {
             leftVehicles.add(vehicle.id());
             if (!isTestMode){
-                sendMessage(String.format("Vehicle %s left the intersection from %s road.",
+                sendMessage(String.format("➖🚘 Vehicle %s left the intersection from %s road.",
                         vehicle.getId(), vehicle.startRoad()));
                 TimeUnit.SECONDS.sleep(2);
             }

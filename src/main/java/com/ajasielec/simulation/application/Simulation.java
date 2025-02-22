@@ -38,7 +38,7 @@ public class Simulation extends AbstractMessageSender {
 
     public void startSimulation() {
         try {
-            sendMessage("Simulation started with " + inputFile);
+            sendMessage("🚀 Simulation started with " + inputFile);
             SimulationResult simulationResult = new SimulationResult();
             CommandList commandList = CommandList.getInstance();
             commandList.loadCommands(inputFile);
@@ -48,17 +48,17 @@ public class Simulation extends AbstractMessageSender {
             }
 
             JsonUtils.serializeResult(simulationResult, outputFile);
-            sendMessage("Simulation results saved to: " + outputFile);
+            sendMessage("💾 Simulation results saved to: " + outputFile);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error reading or writing files: ", e);
-            sendMessage("Error reading or writing files: " + e.getMessage());
+            sendMessage("❌ Error reading or writing files: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "Invalid command or direction: ", e);
-            sendMessage("Invalid input: " + e.getMessage());
+            sendMessage("⚠️ Invalid input: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOGGER.log(Level.SEVERE, "Simulation interrupted: ", e);
-            sendMessage("Simulation was interrupted.");
+            sendMessage("⛔ Simulation was interrupted.");
         }
     }
 
@@ -71,7 +71,7 @@ public class Simulation extends AbstractMessageSender {
                 step(simulationResult);
                 break;
             default:
-                sendMessage("Unknown command type: " + command.getType());
+                sendMessage("⚠️ Unknown command type: " + command.getType());
         }
     }
 
@@ -81,13 +81,13 @@ public class Simulation extends AbstractMessageSender {
         Vehicle vehicle = new Vehicle(command.getVehicleId(), start, end);
         intersection.addVehicle(vehicle);
 
-        sendMessage(String.format("Vehicle %s added on %s road, heading to %s.", vehicle.getId(), start, end));
+        sendMessage(String.format("➕🚗 Vehicle %s added on %s road, heading to %s.", vehicle.getId(), start, end));
     }
 
     private void step(SimulationResult simulationResult) throws InterruptedException {
         List<String> leftVehicles = intersection.step();
         simulationResult.addStepStatus(new StepStatus(leftVehicles));
 
-        sendMessage(String.format("Step completed. Vehicles left the intersection: %s", leftVehicles.isEmpty() ? "None" : String.join(", ", leftVehicles)));
+        sendMessage(String.format("✅ Step completed. Vehicles left the intersection: %s", leftVehicles.isEmpty() ? "None" : String.join(", ", leftVehicles)));
     }
 }

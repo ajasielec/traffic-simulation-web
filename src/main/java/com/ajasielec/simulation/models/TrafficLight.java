@@ -48,15 +48,8 @@ public class TrafficLight extends AbstractMessageSender {
     private void setLightAndSleep(LightColor newColor, int sleepTime) throws InterruptedException {
         this.color = newColor;
         if (!isTestMode) {
-            sendMessage(String.format("Traffic light on %s changed to %s.", cycle, newColor));
+            sendMessage(String.format("🚦 Traffic lights on %s changed to %s.", cycle, newColor));
             TimeUnit.SECONDS.sleep(sleepTime);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "TrafficLight{" +
-                "cycle='" + cycle + '\'' +
-                ", currentColor=" + color + '}';
     }
 }
