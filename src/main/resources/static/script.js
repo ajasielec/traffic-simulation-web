@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log('Received:', message.body);
             outputDiv.innerText += message.body + "\n";
 
-            if (message.body.includes("completed") ||
+            if (message.body.includes("Simulation completed") ||
                 message.body.includes("Simulation failed") ||
                 message.body.includes("Input file not found")) {
                 enableStartButton();
