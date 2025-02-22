@@ -10,6 +10,7 @@ public class TrafficLight extends AbstractMessageSender {
     private LightColor color;
     private TrafficCycle cycle;
     private static boolean isTestMode = false;
+    private String emoji = "";
 
     public TrafficLight() {
     }
@@ -48,7 +49,8 @@ public class TrafficLight extends AbstractMessageSender {
     private void setLightAndSleep(LightColor newColor, int sleepTime) throws InterruptedException {
         this.color = newColor;
         if (!isTestMode) {
-            sendMessage(String.format("🚦 Traffic lights on %s changed to %s.", cycle, newColor));
+            if (messagingTemplate != null) { emoji = "🚦 ";}
+            sendMessage(String.format(emoji + "Traffic lights on %s changed to %s.", cycle, newColor));
             TimeUnit.SECONDS.sleep(sleepTime);
         }
     }
