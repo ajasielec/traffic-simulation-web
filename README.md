@@ -43,6 +43,11 @@ mvn spring-boot:run
 Once the backend is running, access the simulation at:
 http://localhost:8080 or http://localhost:63342
 
+**This is how it looks like:**
+![simulationWeb](https://github.com/user-attachments/assets/d9f56246-4a7d-49ca-84cd-7f77a6802c82)
+
+
+
 ## Input File Format
 The input file should be a JSON file containing a list of commands for the simulation. Here's an example of how the input file should look:
 ```json
