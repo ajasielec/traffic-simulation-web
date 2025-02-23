@@ -90,7 +90,7 @@ public class Simulation extends AbstractMessageSender {
     private void step(SimulationResult simulationResult) throws InterruptedException {
         List<String> leftVehicles = intersection.step();
         simulationResult.addStepStatus(new StepStatus(leftVehicles));
-        if (messagingTemplate != null) { emoji = "➕🚗 ";}
-        sendMessage(String.format("Step completed. Vehicles left the intersection: %s", leftVehicles.isEmpty() ? "None" : String.join(", ", leftVehicles)));
+        if (messagingTemplate != null) { emoji = "✅ ";}
+        sendMessage(String.format(emoji + "Step completed. Vehicles left the intersection: %s", leftVehicles.isEmpty() ? "None" : String.join(", ", leftVehicles)));
     }
 }
